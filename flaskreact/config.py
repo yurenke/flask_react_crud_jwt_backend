@@ -13,8 +13,10 @@ class DevelopmentConfig(Config):
     SQLALCHEMY_ECHO = True
     SECRET_KEY = os.getenv("DEVELOPMENT_SECRET_KEY")
     JWT_SECRET_KEY = os.getenv("DEVELOPMENT_JWT_SECRET")
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)
-    # JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=2)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
+    # JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    # JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
     JWT_TOKEN_LOCATION = ["headers"]
     # JWT_CSRF_CHECK_FORM = True
 # class TestingConfig(Config):

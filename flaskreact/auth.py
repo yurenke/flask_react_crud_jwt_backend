@@ -4,7 +4,7 @@ from flask import Blueprint
 from flask import request
 from flask import jsonify
 from flaskreact.models import db, Account
-from flask_jwt_extended import create_access_token, unset_jwt_cookies
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -41,7 +41,7 @@ def signup():
         "message": "User registered successfully!!"
     })
 
-@bp.route('/logintoken', methods=["POST"])
+@bp.route('/signin', methods=["POST"])
 def create_token():
     email = request.json.get("email", None)
     password = request.json.get("password", None)
@@ -58,16 +58,19 @@ def create_token():
         return jsonify({"message": "Incorrect password"}), 401
       
     access_token = create_access_token(identity=user.id)
+    refresh_token = create_refresh_token(identity=user.id)
   
     return jsonify({
         "id": user.id,
         "email": user.email,
         "username": user.name,
-        "accessToken": access_token
+        "accessToken": access_token,
+        "refreshToken": refresh_token
     })
 
-# @bp.route("/logout", methods=["POST"])
-# def logout():
-#     response = jsonify({"msg": "logout successful"})
-#     # unset_jwt_cookies(response)
-#     return response
+@bp.route("/refreshtoken", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    return jsonify(accessToken=access_token)
