@@ -36,13 +36,27 @@ def list_posts():
     per_page = 5
     if not args:
         page = 1
+        term = None
     
     page = args.get('page', default=1, type=int)
+    term = args.get('term', default=None, type=str)
 
-    total = Post.query.count()
-    postspaging = db.session.query(Post, Account).join(Account, Post.author_id == Account.id).order_by(Post.update_time.desc()).paginate(page=page, per_page=per_page)
+    # .filter(Post.title.like(title))\
+    if term:
+        postspaging = db.session.query(Post, Account)\
+            .join(Account, Post.author_id == Account.id)\
+            .filter(Post.__ts_vector__.match(term, postgresql_regconfig='english'))\
+            .order_by(Post.update_time.desc())\
+            .paginate(page=page, per_page=per_page)
+    else:
+        postspaging = db.session.query(Post, Account)\
+            .join(Account, Post.author_id == Account.id)\
+            .order_by(Post.update_time.desc())\
+            .paginate(page=page, per_page=per_page)
     # postspaging = Post.query.join(Account).order_by(Post.update_time.desc()).paginate(page=page, per_page=per_page)
 
+    # total = postspaging.total
+    totalPages = postspaging.pages
     next_page = postspaging.next_num
     if next_page == None:
         next_page = -1
@@ -56,7 +70,7 @@ def list_posts():
     #     prev_page_url = f"http://127.0.0.1:5000/posts?page={prev_page}"
          
     return jsonify({
-        'total': total,
+        'totalPages': totalPages,
         'next_page': next_page,
         'prev_page': prev_page,
         'results': [{'id': post.id, 'title': post.title, 'content': post.content, 'update_time': post.update_time, 'author_name': author.name,
