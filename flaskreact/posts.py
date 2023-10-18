@@ -73,7 +73,10 @@ def list_posts():
         'totalPages': totalPages,
         'next_page': next_page,
         'prev_page': prev_page,
-        'results': [{'id': post.id, 'title': post.title, 'content': post.content, 'update_time': post.update_time.strftime("%m/%d/%Y, %H:%M:%S"), 'author_name': author.name,
+        'results': [{'id': post.id, 'title': post.title, 'content': post.content, 
+                     "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
+                     'update_time': post.update_time.strftime("%m/%d/%Y, %H:%M"), 
+                     'author_name': author.name,
                      'author_email': author.email} for post, author in postspaging.items]
     })
 
@@ -125,4 +128,7 @@ def single_post(id):
         db.session.commit()
         return jsonify({"message": "successfully delete the post"})
     
-    return jsonify({"id": post.id, "title": post.title, "content": post.content, "update_time": post.update_time.strftime("%m/%d/%Y, %H:%M:%S"), "author": post.accounts.name})
+    return jsonify({"id": post.id, "title": post.title, "content": post.content, 
+                    "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
+                    "update_time": post.update_time.strftime("%m/%d/%Y, %H:%M"), 
+                    "author": post.accounts.name})
