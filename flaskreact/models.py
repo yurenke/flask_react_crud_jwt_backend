@@ -8,7 +8,10 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.sql import func
 from sqlalchemy import cast, literal
 from sqlalchemy.dialects.postgresql import REGCONFIG
+from uuid import uuid4
 
+def get_uuid():
+    return uuid4().hex
 
 def create_tsvector(*args):
     exp = args[0]
@@ -26,7 +29,8 @@ migrate = Migrate()
 
 class Account(db.Model):
     __tablename__ = "accounts"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.String(32), primary_key=True, unique=True, default=get_uuid)
     name = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
