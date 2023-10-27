@@ -34,7 +34,7 @@ class Account(db.Model):
     name = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.Text, nullable=False)
-    posts = db.relationship('Post', backref='accounts')
+    # posts = db.relationship('Post', backref='accounts')
 
     def __init__(self, name, email, password):
         self.name = name
@@ -48,7 +48,9 @@ class Post(db.Model):
     content = db.Column(db.Text)
     create_time = db.Column(db.DateTime, default=datetime.now)
     update_time = db.Column(db.DateTime, onupdate=datetime.now, index=True, default=datetime.now)
-    author_id = db.Column(db.Integer, db.ForeignKey('accounts.id'), nullable=False)
+    author_id = db.Column(db.String(32), db.ForeignKey('accounts.id'), nullable=False)
+    author = db.relationship('Account', backref='posts')
+    # author = db.relationship('Account', backref='posts', lazy='joined')
 
     # __ts_vector__ = db.Column(TSVector(),db.Computed(
     #      "to_tsvector('english', title || ' ' || content)",

@@ -9,6 +9,7 @@ from flask import jsonify
 from flask_jwt_extended import get_jwt_identity, get_jwt, create_access_token
 from flask_jwt_extended import jwt_required
 from flaskreact.models import db, Account, Post
+from sqlalchemy.orm import joinedload
 
 bp = Blueprint("posts", __name__, url_prefix="/posts")
 
@@ -43,14 +44,18 @@ def list_posts():
 
     # .filter(Post.title.like(title))\
     if term:
-        postspaging = db.session.query(Post, Account)\
-            .join(Account, Post.author_id == Account.id)\
+        # postspaging = db.session.query(Post, Account)\
+        #     .join(Account, Post.author_id == Account.id)\
+        postspaging = db.session.query(Post)\
+            .options(joinedload(Post.author))\
             .filter(Post.__ts_vector__.match(term, postgresql_regconfig='english'))\
             .order_by(Post.update_time.desc())\
             .paginate(page=page, per_page=per_page)
     else:
-        postspaging = db.session.query(Post, Account)\
-            .join(Account, Post.author_id == Account.id)\
+        # postspaging = db.session.query(Post, Account)\
+        #     .join(Account, Post.author_id == Account.id)\
+        postspaging = db.session.query(Post)\
+            .options(joinedload(Post.author))\
             .order_by(Post.update_time.desc())\
             .paginate(page=page, per_page=per_page)
     # postspaging = Post.query.join(Account).order_by(Post.update_time.desc()).paginate(page=page, per_page=per_page)
@@ -76,8 +81,9 @@ def list_posts():
         'results': [{'id': post.id, 'title': post.title, 'content': post.content, 
                      "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
                      'update_time': post.update_time.strftime("%m/%d/%Y, %H:%M"), 
-                     'author_name': author.name,
-                     'author_email': author.email} for post, author in postspaging.items]
+                     'author_name': post.author.name,
+                     'author_email': post.author.email} for post in postspaging.items]
+                    #  'author_email': author.email} for post, author in postspaging.items]
     })
 
 @bp.route("/create", methods=["POST"])
@@ -100,7 +106,11 @@ def create_post():
 @jwt_required()
 def single_post(id):
     current_user_id = get_jwt_identity()
-    post = Post.query.get(id)
+    # post = Post.query.get(id)
+    post = db.session.query(Post)\
+            .options(joinedload(Post.author))\
+            .filter(Post.id == id)\
+            .one()
     if not post:
         return jsonify({"message": "not found"}), 404
     
@@ -131,4 +141,4 @@ def single_post(id):
     return jsonify({"id": post.id, "title": post.title, "content": post.content, 
                     "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
                     "update_time": post.update_time.strftime("%m/%d/%Y, %H:%M"), 
-                    "author": post.accounts.name})
+                    "author": post.author.name})
