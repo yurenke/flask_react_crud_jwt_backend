@@ -108,7 +108,6 @@ def single_post(id):
     current_user_id = get_jwt_identity()
     # post = Post.query.get(id)
     post = db.session.query(Post)\
-            .options(joinedload(Post.author))\
             .filter(Post.id == id)\
             .one()
     if not post:
