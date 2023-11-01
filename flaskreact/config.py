@@ -7,7 +7,7 @@ class Config:
     TESTING = False
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
-    DEBUG = True
+    # DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URI")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True

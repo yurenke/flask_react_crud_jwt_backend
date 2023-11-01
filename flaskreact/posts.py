@@ -61,7 +61,7 @@ def list_posts():
         # postspaging = db.session.query(Post, Account)\
         #     .join(Account, Post.author_id == Account.id)\
         postspaging = db.session.query(Post)\
-            .options(joinedload(Post.author))\
+            .options(joinedload(Post.accounts))\
             .filter(Post.__ts_vector__.match(term, postgresql_regconfig='english'))\
             .order_by(Post.update_time.desc())\
             .paginate(page=page, per_page=per_page)
@@ -69,7 +69,7 @@ def list_posts():
         # postspaging = db.session.query(Post, Account)\
         #     .join(Account, Post.author_id == Account.id)\
         postspaging = db.session.query(Post)\
-            .options(joinedload(Post.author))\
+            .options(joinedload(Post.accounts))\
             .order_by(Post.update_time.desc())\
             .paginate(page=page, per_page=per_page)
     # postspaging = Post.query.join(Account).order_by(Post.update_time.desc()).paginate(page=page, per_page=per_page)
@@ -95,8 +95,8 @@ def list_posts():
         'results': [{'id': post.id, 'title': post.title, 'content': post.content, 
                      "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
                      'update_time': post.update_time.strftime("%m/%d/%Y, %H:%M"), 
-                     'author_name': post.author.name,
-                     'author_email': post.author.email} for post in postspaging.items]
+                     'author_name': post.accounts.name,
+                     'author_email': post.accounts.email} for post in postspaging.items]
                     #  'author_email': author.email} for post, author in postspaging.items]
     })
 
@@ -143,4 +143,4 @@ def single_post(id):
     return jsonify({"id": post.id, "title": post.title, "content": post.content, 
                     "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
                     "update_time": post.update_time.strftime("%m/%d/%Y, %H:%M"), 
-                    "author": post.author.name})
+                    "author": post.accounts.name})
