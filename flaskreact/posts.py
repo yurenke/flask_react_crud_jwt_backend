@@ -11,7 +11,7 @@ from flask_jwt_extended import jwt_required
 from flaskreact.models import db, Account, Post
 from sqlalchemy.orm import joinedload
 
-bp = Blueprint("posts", __name__, url_prefix="/posts")
+bp = Blueprint("posts", __name__, url_prefix="/v1/posts")
 
 # @bp.after_request
 # def refresh_expiring_jwts(response):
@@ -30,9 +30,23 @@ bp = Blueprint("posts", __name__, url_prefix="/posts")
 #         # Case where there is not a valid JWT. Just return the original respone
 #         return response
     
-@bp.route("/all", methods=["GET"])
+@bp.route("/", methods=["GET", "POST"], strict_slashes=False)
 @jwt_required()
 def list_posts():
+    if request.method == 'POST':
+        author = get_jwt_identity()
+        title = request.json.get('title', None)
+        content = request.json.get('content', '')
+
+        if not title:
+            return jsonify({'message': 'title is required'}), 400
+        
+        newpost = Post(title=title, content=content, author_id=author)
+    
+        db.session.add(newpost)
+        db.session.commit()
+        return jsonify({'message': 'new post created successfully'})
+    
     args = request.args
     per_page = 5
     if not args:
@@ -86,21 +100,10 @@ def list_posts():
                     #  'author_email': author.email} for post, author in postspaging.items]
     })
 
-@bp.route("/create", methods=["POST"])
-@jwt_required()
-def create_post():
-    author = get_jwt_identity()
-    title = request.json.get('title', None)
-    content = request.json.get('content', '')
-
-    if not title:
-        return jsonify({'message': 'title is required'}), 400
+# @bp.route("/create", methods=["POST"])
+# @jwt_required()
+# def create_post():
     
-    newpost = Post(title=title, content=content, author_id=author)
- 
-    db.session.add(newpost)
-    db.session.commit()
-    return jsonify({'message': 'new post created successfully'})
 
 @bp.route("/<int:id>", methods=["GET", "PUT", "DELETE"])
 @jwt_required()

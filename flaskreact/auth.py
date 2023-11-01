@@ -6,7 +6,7 @@ from flask import jsonify
 from flaskreact.models import db, Account
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 
-bp = Blueprint("auth", __name__, url_prefix="/auth")
+bp = Blueprint("auth", __name__, url_prefix="/v1/auth")
 
 @bp.route("/signup", methods=["POST"])
 def signup():
