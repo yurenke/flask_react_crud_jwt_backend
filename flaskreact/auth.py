@@ -1,5 +1,4 @@
-from flaskreact.extensions import jwt, bcrypt
-from datetime import timedelta
+from flaskreact.extensions import bcrypt
 from flask import Blueprint
 from flask import request
 from flask import jsonify

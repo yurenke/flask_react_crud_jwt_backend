@@ -1,38 +1,16 @@
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
-import json
-
 from flask import Blueprint
 from flask import request
 from flask import jsonify
-from flask_jwt_extended import get_jwt_identity, get_jwt, create_access_token
+from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
-from flaskreact.models import db, Account, Post
+from flaskreact.models import db, Post
 from sqlalchemy.orm import joinedload
 
 bp = Blueprint("posts", __name__, url_prefix="/v1/posts")
-
-# @bp.after_request
-# def refresh_expiring_jwts(response):
-#     try:
-#         exp_timestamp = get_jwt()["exp"]
-#         now = datetime.now(timezone.utc)
-#         target_timestamp = datetime.timestamp(now + timedelta(minutes=10))
-#         if target_timestamp > exp_timestamp:
-#             access_token = create_access_token(identity=get_jwt_identity())
-#             data = response.get_json()
-#             if type(data) is dict:
-#                 data["accessToken"] = access_token 
-#                 response.data = json.dumps(data)
-#         return response
-#     except (RuntimeError, KeyError):
-#         # Case where there is not a valid JWT. Just return the original respone
-#         return response
     
 @bp.route("/", methods=["GET", "POST"], strict_slashes=False)
 @jwt_required()
-def list_posts():
+def list_or_create_posts():
     if request.method == 'POST':
         author = get_jwt_identity()
         title = request.json.get('title', None)
@@ -58,35 +36,25 @@ def list_posts():
 
     # .filter(Post.title.like(title))\
     if term:
-        # postspaging = db.session.query(Post, Account)\
-        #     .join(Account, Post.author_id == Account.id)\
         postspaging = db.session.query(Post)\
             .options(joinedload(Post.accounts))\
             .filter(Post.__ts_vector__.match(term, postgresql_regconfig='english'))\
             .order_by(Post.update_time.desc())\
             .paginate(page=page, per_page=per_page)
     else:
-        # postspaging = db.session.query(Post, Account)\
-        #     .join(Account, Post.author_id == Account.id)\
         postspaging = db.session.query(Post)\
             .options(joinedload(Post.accounts))\
             .order_by(Post.update_time.desc())\
             .paginate(page=page, per_page=per_page)
-    # postspaging = Post.query.join(Account).order_by(Post.update_time.desc()).paginate(page=page, per_page=per_page)
 
-    # total = postspaging.total
     totalPages = postspaging.pages
     next_page = postspaging.next_num
     if next_page == None:
         next_page = -1
-    # else:
-    #     next_page_url = f"http://127.0.0.1:5000/posts?page={next_page}"
         
     prev_page = postspaging.prev_num
     if prev_page == None:
         prev_page = -1
-    # else:
-    #     prev_page_url = f"http://127.0.0.1:5000/posts?page={prev_page}"
          
     return jsonify({
         'totalPages': totalPages,
@@ -97,13 +65,7 @@ def list_posts():
                      'update_time': post.update_time.strftime("%m/%d/%Y, %H:%M"), 
                      'author_name': post.accounts.name,
                      'author_email': post.accounts.email} for post in postspaging.items]
-                    #  'author_email': author.email} for post, author in postspaging.items]
     })
-
-# @bp.route("/create", methods=["POST"])
-# @jwt_required()
-# def create_post():
-    
 
 @bp.route("/<int:id>", methods=["GET", "PUT", "DELETE"])
 @jwt_required()

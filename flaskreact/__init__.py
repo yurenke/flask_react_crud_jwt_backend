@@ -1,18 +1,12 @@
-import json
-from flask import Flask, request, jsonify
-from datetime import datetime, timedelta, timezone
-from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, unset_jwt_cookies, jwt_required, JWTManager
-
+from flask import Flask
 from flask_cors import CORS
 
 from flaskreact.config import config
-from flaskreact.models import db, migrate, Account, Post
+from flaskreact.models import db, migrate
 from flaskreact.extensions import jwt, bcrypt
 
 def create_app(mode='development'):
-    # create and configure the app
-    # app = Flask(__name__, instance_relative_config=True)
-    # load_dotenv()
+
     app = Flask(__name__)
     CORS(app)
     
