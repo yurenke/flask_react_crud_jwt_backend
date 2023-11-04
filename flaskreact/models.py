@@ -43,8 +43,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(100), nullable=False)
     content = db.Column(db.Text)
-    create_time = db.Column(db.DateTime, default=datetime.now)
-    update_time = db.Column(db.DateTime, onupdate=datetime.now, index=True, default=datetime.now)
+    create_time = db.Column(db.DateTime(timezone=True), default=datetime.utcnow)
+    update_time = db.Column(db.DateTime(timezone=True), onupdate=datetime.utcnow, index=True, default=datetime.utcnow)
     author_id = db.Column(db.String(32), db.ForeignKey('accounts.id'), nullable=False)
     __ts_vector__ = create_tsvector(
         cast(func.coalesce(title, ''), postgresql.TEXT),

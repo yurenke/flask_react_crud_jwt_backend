@@ -61,8 +61,8 @@ def list_or_create_posts():
         'next_page': next_page,
         'prev_page': prev_page,
         'results': [{'id': post.id, 'title': post.title, 'content': post.content, 
-                     "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
-                     'update_time': post.update_time.strftime("%m/%d/%Y, %H:%M"), 
+                     "create_time": post.create_time.astimezone().strftime("%m/%d/%Y, %H:%M %Z"), 
+                     'update_time': post.update_time.astimezone().strftime("%m/%d/%Y, %H:%M %Z"), 
                      'author_name': post.accounts.name,
                      'author_email': post.accounts.email} for post in postspaging.items]
     })
@@ -103,6 +103,6 @@ def single_post(id):
         return jsonify({"message": "successfully delete the post"})
     
     return jsonify({"id": post.id, "title": post.title, "content": post.content, 
-                    "create_time": post.create_time.strftime("%m/%d/%Y, %H:%M"), 
-                    "update_time": post.update_time.strftime("%m/%d/%Y, %H:%M"), 
+                    "create_time": post.create_time.astimezone().strftime("%m/%d/%Y, %H:%M %Z"), 
+                    "update_time": post.update_time.astimezone().strftime("%m/%d/%Y, %H:%M %Z"), 
                     "author": post.accounts.name})

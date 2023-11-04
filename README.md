@@ -16,7 +16,7 @@ $ docker run -d \
 $ docker exec -it my-postgres bash
 # psql -U postgres
 ```
-> you will be presented with a psql terminal like this
+you will be presented with a psql terminal like this
 ```
 psql (16.0 (Debian 16.0-1.pgdg120+1))
 Type "help" for help.
@@ -63,7 +63,7 @@ $ source ./.venv/bin/activate
 ```
 (.venv) $ nano flaskreact/.env
 ```
-> set the corresponding settings
+set the corresponding settings
 ```
 DATABASE_URI='postgresql+psycopg2://test:test@localhost:5432/testdb'
 DEVELOPMENT_SECRET_KEY='flask app secret key'              <- modify this
@@ -77,15 +77,29 @@ DEVELOPMENT_JWT_SECRET='flask-jwt-extended jwt secret key' <- modify this
 (.venv) $ flask db upgrade
 ```
 
-## 3. Run the Flask development server
+## 3. Start the local Flask server
 ```
 ### unser the project root folder ###
 (.venv) $ flask run
 ```
-> you should see this after flask run
+you should see this after flask run
 ```
 * Debug mode: off
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
 ```
+
+# React frontend
+## 1. Install dependencies
+```
+### under the react app root folder ###
+$ npm install
+```
+
+## 2. Start local web server
+```
+$ npm start
+```
+and then you can open http://localhost:3000 to view it in the browser.
+

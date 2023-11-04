@@ -8,7 +8,7 @@ from flaskreact.extensions import jwt, bcrypt
 def create_app(mode='development'):
 
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, origins=["http://localhost:3000"])
     
     app.config.from_object(config[mode])
 
