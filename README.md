@@ -83,6 +83,16 @@ DEVELOPMENT_JWT_SECRET='flask-jwt-extended jwt secret key' <- modify this
 (.venv) $ flask run
 or
 (.venv) $ flask --app "flaskreact:create_app(mode='development')" run
+
+if using gunicorn
+(.venv) $ gunicorn -w 4 "flaskreact:create_app(mode='development')"
+or create a wsgi.py
+inside wsgi.py
+from my_project import create_app
+
+app = create_app()
+
+(.venv) $ gunicorn -w 4 my_project.wsgi:app
 ```
 you should see this after flask run
 ```
