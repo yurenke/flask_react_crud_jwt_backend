@@ -81,6 +81,8 @@ DEVELOPMENT_JWT_SECRET='flask-jwt-extended jwt secret key' <- modify this
 ```
 ### unser the project root folder ###
 (.venv) $ flask run
+or
+(.venv) $ flask --app "flaskreact:create_app(mode='development')" run
 ```
 you should see this after flask run
 ```
@@ -89,17 +91,4 @@ WARNING: This is a development server. Do not use it in a production deployment.
  * Running on http://127.0.0.1:5000
 Press CTRL+C to quit
 ```
-
-# React frontend
-## 1. Install dependencies
-```
-### under the react app root folder ###
-$ npm install
-```
-
-## 2. Start local web server
-```
-$ npm start
-```
-and then you can open http://localhost:3000 to view it in the browser.
 
